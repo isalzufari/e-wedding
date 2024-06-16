@@ -7,7 +7,7 @@ const pool = mysql.createPool({
   password: process.env.PASSWORD,
 });
 
-pool.getConnection(err => {
+pool.getConnection((err, connection) => {
   if (err) {
     console.log(err);
   }

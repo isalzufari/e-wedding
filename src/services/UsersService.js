@@ -31,20 +31,16 @@ class UsersService {
       values: [name, email, hashedPassword, phone_number, 0, 0],
     };
 
-    try {
-      const [result, fields] = await this._pool.query(
-        query.text,
-        query.values,
-      );
+    const [result, fields] = await this._pool.query(
+      query.text,
+      query.values,
+    );
 
-      if (!result.insertId) {
-        throw new InvariantError('User gagal ditambahkan: addUser');
-      }
-
-      return result.insertId;
-    } catch (error) {
-      console.log(error)
+    if (!result.insertId) {
+      throw new InvariantError('User gagal ditambahkan: addUser');
     }
+
+    return result.insertId;
   }
 
   async editUser({ id, name, email, password, phone_number }) {
@@ -112,6 +108,38 @@ class UsersService {
     }
 
     return { id, isAdmin };
+  }
+
+  async verifyIsOwnCatalogues({ usersId, cataloguesId }) {
+    const query = {
+      text: 'SELECT id FROM `catalogues` WHERE `id_users` = ? AND `id` = ?',
+      values: [usersId, cataloguesId],
+    };
+
+    const [result, fields] = await this._pool.query(
+      query.text,
+      query.values,
+    );
+
+    if (!result.length > 0) {
+      throw new InvariantError('Anda tidak mempunyai akses!');
+    }
+  }
+
+  async verifyIsAdmin({ usersId }) {
+    const query = {
+      text: 'SELECT id FROM `users` WHERE `id` = ? AND isAdmin = 1',
+      values: [usersId],
+    };
+
+    const [result, fields] = await this._pool.query(
+      query.text,
+      query.values,
+    );
+
+    if (!result.length > 0) {
+      throw new InvariantError('Anda tidak mempunyai akses!');
+    }
   }
 }
 

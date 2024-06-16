@@ -52,7 +52,9 @@ class CataloguesService {
 
   async getCataloguesBySlug({ slug }) {
     const query = {
-      text: 'SELECT package_name, description, price, image_url FROM `catalogues` WHERE `slug` = ? AND isPublished = 1',
+      text: `SELECT 
+      id, package_name, description, price, image_url FROM catalogues 
+      WHERE slug = ? AND isPublished = 1`,
       values: [slug],
     };
 
@@ -70,11 +72,28 @@ class CataloguesService {
 
   async getCatalogues() {
     const query = {
-      text: `SELECT package_name, slug, description, price, image_url FROM catalogues WHERE isPublished = 1`,
+      text: `SELECT id, package_name, slug, description, price, image_url, isPublished FROM catalogues WHERE isPublished = 1`,
     }
 
     const [result, fields] = await this._pool.query(
       query.text,
+    );
+
+    return result;
+  }
+
+  async getCataloguesAdmin({ usersId }) {
+    const query = {
+      text: `SELECT 
+      id, package_name, slug, description, price, image_url, isPublished 
+      FROM catalogues 
+      WHERE id_users = ?`,
+      values: [usersId]
+    }
+
+    const [result, fields] = await this._pool.query(
+      query.text,
+      query.values,
     );
 
     return result;
@@ -125,11 +144,10 @@ class CataloguesService {
     );
   }
 
-  // List Article From Admin
-  async getArticlesById({ id_user }) {
+  async getCataloguesById({ cataloguesId }) {
     const query = {
-      text: 'SELECT * FROM `article` INNER JOIN `articles` ON article.id_article = articles.id WHERE `id_user` = ?',
-      values: [id_user],
+      text: 'SELECT package_name, description, price, image_url AS image FROM `catalogues` WHERE `id` = ?',
+      values: [cataloguesId],
     };
 
     const [result, fields] = await this._pool.query(
@@ -138,10 +156,10 @@ class CataloguesService {
     );
 
     if (!result.length > 0) {
-      throw new NotFoundError('Article tidak tersedia');
+      throw new NotFoundError('Katalog tidak tersedia');
     }
 
-    return result;
+    return result[0];
   }
 }
 

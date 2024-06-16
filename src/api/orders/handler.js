@@ -62,6 +62,7 @@ class CataloguesHandler {
     const { id: usersId } = request.auth.credentials;
     const { id: ordersId } = request.params;
 
+    await this._usersService.verifyIsAdmin({ usersId });
     const { status } = await this._ordersService.checkIsApprovedOrders({ ordersId });
     const updateStatus = status === 0 ? 1 : 0;
 
@@ -86,8 +87,15 @@ class CataloguesHandler {
   }
 
   async getOrdersHandler(request, h) {
-    const { id: usersId } = request.auth.credentials;
-    const data = await this._ordersService.getOrders();
+    const { id: usersId, isAdmin = null } = request.auth.credentials;
+
+    let data;
+    if (isAdmin) {
+      data = await this._ordersService.adminGetOrders();
+    } else {
+      data = await this._ordersService.getOrders({ usersId });
+    }
+
     return {
       status: 'success',
       data

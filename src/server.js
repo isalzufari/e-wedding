@@ -62,6 +62,7 @@ const init = async () => {
       isValid: true,
       credentials: {
         id: artifacts.decoded.payload.id,
+        isAdmin: artifacts.decoded.payload.isAdmin,
       }
     }),
   });

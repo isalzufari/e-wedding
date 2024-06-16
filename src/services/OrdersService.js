@@ -101,7 +101,23 @@ class OrdersService {
     return result[0];
   }
 
-  async getOrders() {
+  async getOrders({ usersId }) {
+    const query = {
+      text: `SELECT 
+      OS.id, US.name, US.email, US.phone_number, OS.wedding_date, OS.status, CS.package_name, CS.price
+      FROM orders AS OS
+      INNER JOIN catalogues AS CS ON CS.id = OS.id_catalogues
+      INNER JOIN users AS US ON US.id = OS.id_users
+      WHERE OS.id_users = ?`,
+      values: [usersId],
+    };
+
+    const [result, fields] = await this._pool.query(query.text, query.values);
+
+    return result;
+  }
+
+  async adminGetOrders() {
     const query = {
       text: `SELECT 
       OS.id, US.name, US.email, US.phone_number, OS.wedding_date, OS.status, CS.package_name, CS.price
@@ -111,10 +127,6 @@ class OrdersService {
     };
 
     const [result, fields] = await this._pool.query(query.text);
-
-    if (!result.length > 0) {
-      throw new NotFoundError('Pesanan tidak tersedia!');
-    }
 
     return result;
   }

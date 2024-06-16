@@ -16,16 +16,6 @@ const routes = (handler) => [
     },
   },
   {
-    method: 'GET',
-    path: '/{slug}',
-    handler: handler.getCataloguesBySlugHandler,
-  },
-  {
-    method: 'GET',
-    path: '/',
-    handler: handler.getCataloguesHandler,
-  },
-  {
     method: 'DELETE',
     path: '/{id}',
     handler: handler.deleteCataloguesHandler,
@@ -40,6 +30,27 @@ const routes = (handler) => [
     options: {
       auth: 'emading_jwt'
     },
+  },
+  {
+    method: 'GET',
+    path: '/',
+    handler: handler.getCataloguesHandler,
+    options: {
+      auth: {
+        strategy: 'emading_jwt',
+        mode: 'optional'
+      }
+    },
+  },
+  {
+    method: 'GET',
+    path: '/{slug}',
+    handler: handler.getCataloguesBySlugHandler,
+  },
+  {
+    method: 'GET',
+    path: '/{id}/admin',
+    handler: handler.getCataloguesByIdHandler,
   },
 ]
 
